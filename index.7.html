@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet">
+    <title>树成林答案之书</title>
+    <style>
+        body {
+            font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-image: url('https://picsum.photos/1920/1080?grayscale&blur=2&random=1');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: 'forest education';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(5);
+            font-size: 10vw;
+            color: rgba(255, 255, 255, 0.1);
+            filter: blur(8px);
+            z-index: -1;
+            white-space: nowrap;
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            padding: 48px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .title-module {
+            margin-bottom: 16px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #1d1d1f;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            margin-bottom: 24px;
+        }
+
+        .prompt-module {
+            margin-bottom: 32px;
+        }
+
+        .prompt {
+            font-size: 18px;
+            color: #6e6e73;
+            margin-bottom: 16px;
+        }
+
+        #askButton {
+            background-color: #007aff;
+            color: #fff;
+            font-size: 22px;
+            font-weight: 500;
+            padding: 18px 36px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #askButton:hover {
+            background-color: #0062cc;
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .answer-module {
+            margin-top: 32px;
+            padding: 24px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 16px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        #answer {
+            font-size: 40px;
+            font-weight: 600;
+            color: #1d1d1f;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #answer.show {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 32px;
+            }
+
+            h1 {
+                font-size: 36px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+            }
+
+            .prompt {
+                font-size: 16px;
+            }
+
+            #askButton {
+                font-size: 20px;
+                padding: 16px 32px;
+            }
+
+            #answer {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="title-module">
+            <h1>树成林答案之书</h1>
+            <p class="subtitle">为你的难题提供指引</p>
+        </div>
+        <div class="prompt-module">
+            <p class="prompt">在生活中，你是否常常遇到各种困惑？</p>
+            <p class="prompt">默念你心中的问题，点击询问</p>
+            <button id="askButton">询问</button>
+        </div>
+        <div class="answer-module">
+            <div id="answer"></div>
+        </div>
+    </div>
+
+    <script>
+        const originalAnswers = [
+            "一切都会朝着好的方向发展。",
+            "积极行动会带来好结果。",
+            "保持耐心，等待时机成熟。",
+            "事情会顺利解决的。",
+            "你有足够的能力应对。",
+            "此刻的坚持会有回报。",
+            "会有意外的助力出现。",
+            "别犹豫，大胆去做。",
+            "过程或许曲折，但结局美好。",
+            "相信自己的判断。",
+            "问题会在合适的时候解决。",
+            "付出会有相应的收获。",
+            "保持乐观，好运将至。",
+            "会有新的转机出现。",
+            "抓住眼前的机会。",
+            "结果会比预期好。",
+            "与他人合作会有成效。",
+            "保持冷静，理性应对。",
+            "你的努力不会白费。",
+            "困难只是暂时的。",
+            "调整心态，重新出发。",
+            "会有贵人相助。",
+            "大胆创新，会有突破。",
+            "按计划进行就好。",
+            "现在是行动的好时机。",
+            "结局会令人满意。",
+            "多沟通会带来好处。",
+            "相信团队的力量。",
+            "危机中蕴含着机遇。",
+            "坚持下去，必有收获。",
+            "不要被眼前的困难吓倒。",
+            "会有新的思路涌现。",
+            "做出改变，会有进步。",
+            "保持专注，避免分心。",
+            "事情会逐步明朗。",
+            "你的付出会被看见。",
+            "勇敢面对挑战。",
+            "会有积极的反馈。",
+            "把握当下，珍惜机会。",
+            "以平和心态面对。",
+            "会有好消息传来。",
+            "尝试新方法，会有惊喜。",
+            "坚持初心，方得始终。",
+            "结果会如你所愿。",
+            "与人合作能事半功倍。",
+            "冷静思考，寻找解决办法。",
+            "付出终将得到回报。",
+            "困难是成长的阶梯。",
+            "重新审视，会有新发现。",
+            "大胆表达自己的想法。",
+            "按照节奏，稳步前进。",
+            "未来充满希望。",
+            "善于倾听，会有收获。",
+            "会有新的开始。",
+            "保持积极，迎接挑战。",
+            "行动起来，改变现状。",
+            "结局会是圆满的。",
+            "多学习，会有提升。",
+            "相信自己的能力。",
+            "事情会慢慢变好。",
+            "抓住关键，解决问题。",
+            "会有意外的收获。",
+            "保持自信，展现自我。",
+            "不要轻易放弃。",
+            "会有新的合作机会。",
+            "做出正确的选择。",
+            "以乐观心态应对。",
+            "会有正面的结果。",
+            "勇于尝试，突破自我。",
+            "坚持原则，不会出错。",
+            "结果会让你满意。",
+            "团队协作会更高效。",
+            "冷静应对，化险为夷。",
+            "付出总有回报。",
+            "困难只是小插曲。",
+            "重新规划，会有进展。",
+            "大胆去尝试新事物。",
+            "按部就班，达成目标。",
+            "未来一片光明。",
+            "善于总结，不断进步。",
+            "会有新的机遇降临。",
+            "保持热情，投入工作。",
+            "行动创造价值。",
+            "结局会很美好。",
+            "多积累，会有成效。",
+            "相信自己的直觉。",
+            "事情会迎刃而解。",
+            "抓住重点，提高效率。",
+            "会有惊喜出现。",
+            "保持谦逊，学习他人。",
+            "不要害怕失败。",
+            "会有新的发展方向。",
+            "做出明智的决策。",
+            "以积极态度面对。",
+            "会有良好的结果。",
+            "勇于创新，引领潮流。",
+            "坚持到底，就是胜利。",
+            "结果会超出预期。",
+            "团队合作会更默契。",
+            "冷静分析，找到方法。",
+            "付出必有收获。",
+            "困难是成功的前奏。",
+            "重新出发，再创佳绩。",
+            "大胆展示自己的实力。",
+            "循序渐进，走向成功。"
+        ];
+        const specialAnswer = "隔着问啥呢，问AI去！";
+        const probability = 0.36;
+        const totalLength = Math.ceil(originalAnswers.length / (1 - probability));
+        const specialAnswerCount = totalLength - originalAnswers.length;
+        const answers = [...originalAnswers, ...Array(specialAnswerCount).fill(specialAnswer)];
+
+        const askButton = document.getElementById('askButton');
+        const answerDiv = document.getElementById('answer');
+
+        askButton.addEventListener('click', () => {
+            const randomIndex = Math.floor(Math.random() * answers.length);
+            const randomAnswer = answers[randomIndex];
+            answerDiv.textContent = randomAnswer;
+            answerDiv.classList.remove('show');
+            setTimeout(() => {
+                answerDiv.classList.add('show');
+            }, 50);
+        });
+    </script>
+</body>
+
+</html>
+    
